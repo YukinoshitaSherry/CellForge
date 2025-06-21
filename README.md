@@ -145,15 +145,10 @@ MAX_TOKENS=4096000
 - Anthropic (Claude)
 
 **Search API Keys:**
-- **GitHub Token**: For searching GitHub repositories and code (optional)
-- **SerpAPI Key**: For web search functionality (required)
-
-**How to get API keys:**
-- **OpenAI**: [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-- **Anthropic**: [https://console.anthropic.com/](https://console.anthropic.com/)
-- **GitHub**: [https://github.com/settings/tokens](https://github.com/settings/tokens)
-- **SerpAPI**: [https://serpapi.com/](https://serpapi.com/)
-
+- **GitHub Token**: For searching GitHub repositories and code 
+- **SerpAPI Key**: For web search functionality
+- **PubMedAPI Key**: For web search functionality (optional)
+- 
 ### 3️⃣ Run BioForge
 
 **Complete Workflow:**
@@ -173,21 +168,22 @@ python main.py --phase method_design
 python main.py --phase code_generation
 ```
 
-**Initialize Project:**
+**Initialize Project**:
 ```bash
 python main.py --init
 ```
+> **💡 What this does**: Creates a default `config.json` file with standard settings, sets up the basic project structure, and prepares BioForge for first-time use. Run this command if you're starting fresh or if the configuration file is missing.
 
 ## 🔧 Usage
 
-### Command Line Interface
+### 💻 Command Line Interface
 
 **Complete Workflow**:
 ```bash
 python main.py
 ```
 
-**With Custom Config**:
+**With Custom Config (optional)**:
 ```bash
 python main.py --config my_config.json
 ```
@@ -201,6 +197,115 @@ python main.py --init
 ```bash
 python start.py
 ```
+
+### 📝 Task Description Configuration
+
+**Where to Modify Task Description:**
+
+The task description is defined in the `main.py` file. To customize your analysis task:
+
+1. **Edit the DEFAULT_TASK_DESCRIPTION variable** in `main.py` (around line 25):
+
+```python
+# Default task description - EDIT THIS VARIABLE TO CUSTOMIZE YOUR TASK
+DEFAULT_TASK_DESCRIPTION = """Your task is to develop a predictive model that accurately estimates gene expression profiles of individual K562 cells following CRISPR interference (CRISPRi), using the dataset from Norman et al. (2019, Science).
+
+Task Definition:
+- Input: Baseline gene expression profile of an unperturbed K562 cell and the identity of the target gene(s) for perturbation
+- Output: Predicted gene expression profile after perturbation
+
+Evaluation Scenarios:
+1. Unseen Perturbations: Predict effects of gene perturbations not present during training
+2. Unseen Cell Contexts: Predict responses in cells with gene expression profiles not observed during training
+
+Evaluation Metrics:
+- Mean Squared Error (MSE): Measures the average squared difference between predicted and observed gene expression.
+- Pearson Correlation Coefficient (PCC): Quantifies linear correlation between predicted and observed profiles.
+- R² (Coefficient of Determination): Represents the proportion of variance in the observed gene expression that can be explained by the predicted values.
+- MSE for Differentially Expressed (DE) Genes (MSE_DE): Same as MSE but computed specifically for genes identified as differentially expressed.
+- PCC for Differentially Expressed (DE) Genes (PCC_DE): Same as PCC but computed specifically for genes identified as differentially expressed.
+- R² for Differentially Expressed (DE) Genes (R2_DE): Same as R² but computed specifically for genes identified as differentially expressed."""
+```
+
+2. **Or create a custom config file** (`my_config.json`):
+
+```json
+{
+  "task_description": "Your custom task description here...",
+  "dataset_path": "BioForge/data/datasets/",
+  "output_dir": "results/",
+  "llm_config": {
+    "provider": "openai",
+    "model": "gpt-4-turbo-preview",
+    "api_key": "loaded_from_env"
+  },
+  "workflow_phases": ["task_analysis", "method_design", "code_generation"]
+}
+```
+
+🧬 **Task Description Template:**
+
+```python
+DEFAULT_TASK_DESCRIPTION = """Your task is to [TASK_GOAL] using [DATASET_NAME].
+
+Task Definition:
+- Input: [DESCRIBE_INPUT_DATA]
+- Output: [DESCRIBE_EXPECTED_OUTPUT]
+
+Evaluation Scenarios:
+1. [SCENARIO_1]: [DESCRIPTION]
+2. [SCENARIO_2]: [DESCRIPTION]
+
+Evaluation Metrics:
+- [METRIC_1]: [DESCRIPTION]
+- [METRIC_2]: [DESCRIPTION]
+- [METRIC_3]: [DESCRIPTION]"""
+```
+
+### 📁 Dataset Configuration
+
+**Where to Place Your Datasets:**
+
+1. **Dataset root filepath shuold be**: `BioForge/data/datasets/`
+
+2. **Supported Dataset Formats**:
+   You can download Datasets from [scPerturb](https://projects.sanderlab.org/scperturb/)** (recommended) or using other `.h5ad` (AnnData format) datasets.
+
+4. **Dataset Directory Structure**:
+```
+BioForge/data/datasets/
+├── your_dataset_1.h5ad
+└── subfolder/ # eg scATAC-seq dataset folder downloded from scPerturb
+    └── nested_dataset.h5ad
+    └── nested_dataset.csv
+    └── ...
+```
+
+### 🔄 Workflow Phases
+
+**Complete End-to-End Workflow**:
+```bash
+python main.py
+```
+
+**Individual Phases**:
+
+If you want to execute individual phases, run following instructions separately:
+```bash
+# Phase 1: Task Analysis
+python main.py --phase task_analysis
+
+# Phase 2: Method Design  
+python main.py --phase method_design
+
+# Phase 3: Code Generation
+python main.py --phase code_generation
+```
+
+**Phase Descriptions**:
+- **Task Analysis**: Understands and decomposes your analysis task
+- **Method Design**: Designs optimal computational methods using multi-agent collaboration
+- **Code Generation**: Generates production-ready code for your analysis pipeline
 
 
 ## 🔍 Troubleshooting
