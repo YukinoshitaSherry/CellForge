@@ -1,4 +1,4 @@
-![BioForge Workflow](./Figs/bioforge.png){ width=10% }
+![BioForge icon](./Figs/bioforge.png){width=10%}
 # BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
