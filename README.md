@@ -20,7 +20,7 @@
 
 BioForge is a cutting-edge **end-to-end** multi-agent framework that revolutionizes single-cell data analysis through intelligent task decomposition, automated method design, and collaborative problem-solving. The system integrates advanced agentic technique and domain-specific expertise to provide comprehensive solutions for single-cell genomics challenges.
 
-![BioForge Workflow](./Figs/Bioforge_workflow.png)
+![BioForge Workflow](./figs/Bioforge_workflow.png)
 
 ## 🚀 Installation
 
