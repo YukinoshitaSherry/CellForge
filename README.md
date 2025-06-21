@@ -149,62 +149,25 @@ MAX_TOKENS=4096000
 - **SerpAPI Key**: For web search functionality
 - **PubMedAPI Key**: For web search functionality (optional)
 - 
-### 3️⃣ Run BioForge
 
-**Complete Workflow:**
-```bash
-python main.py
-```
+## 3️⃣ Initialize Project
 
-**Individual Phases:**
-```bash
-# Task Analysis only
-python main.py --phase task_analysis
+### 🔧 Initialize BioForge
 
-# Method Design only
-python main.py --phase method_design
-
-# Code Generation only
-python main.py --phase code_generation
-```
-
-**Initialize Project**:
 ```bash
 python main.py --init
 ```
 > **💡 What this does**: Creates a default `config.json` file with standard settings, sets up the basic project structure, and prepares BioForge for first-time use. Run this command if you're starting fresh or if the configuration file is missing.
 
-## 🔧 Usage
 
-### 💻 Command Line Interface
-
-**Complete Workflow**:
-```bash
-python main.py
-```
-
-**With Custom Config (optional)**:
-```bash
-python main.py --config my_config.json
-```
-
-**Initialize Project**:
-```bash
-python main.py --init
-```
-
-**Verify Setup**:
-```bash
-python start.py
-```
 
 ### 📝 Task Description Configuration
 
 **Where to Modify Task Description:**
 
-The task description is defined in the `main.py` file. To customize your analysis task:
+The task description is defined in the `BioForge/main.py` file. To customize your analysis task:
 
-1. **Edit the DEFAULT_TASK_DESCRIPTION variable** in `main.py` (around line 25):
+1. **Edit the DEFAULT_TASK_DESCRIPTION variable** in `BioForge/main.py` (around line 30):
 
 ```python
 # Default task description - EDIT THIS VARIABLE TO CUSTOMIZE YOUR TASK
@@ -309,6 +272,29 @@ python main.py --phase code_generation
 
 
 ## 🔍 Troubleshooting
+
+
+### 💻 Command Line Interface
+
+**Complete Workflow**:
+```bash
+python main.py
+```
+
+**With Custom Config (optional)**:
+```bash
+python main.py --config my_config.json
+```
+
+**Initialize Project**:
+```bash
+python main.py --init
+```
+
+**Verify Setup**:
+```bash
+python start.py
+```
 
 ### Common Issues
 
