@@ -1,5 +1,4 @@
-<img src="https://github.com/gersteinlab/scAgents/tree/main/Figs/bioforge.png" alt="icon" width="8px"/>
-<h1 style="display:inline-block; vertical-align:middle; margin:0;">BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration</h1>
+#BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -21,7 +20,7 @@
 
 BioForge is a cutting-edge **end-to-end** multi-agent framework that revolutionizes single-cell data analysis through intelligent task decomposition, automated method design, and collaborative problem-solving. The system integrates advanced language models, vector databases, and domain-specific expertise to provide comprehensive solutions for single-cell genomics challenges.
 
-<p align="center"><img src="https://github.com/gersteinlab/scAgents/tree/main/Figs/Bioforge_workflow.png" alt="workflow" width="800px" /></p>
+![BioForge Workflow](./Figs/Bioforge_workflow.png)
 
 ## 🚀 Installation
 
