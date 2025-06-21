@@ -1,10 +1,8 @@
+![BioForge Workflow](./Figs/bioforge.png){ width=10% }
 # BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-> **End-to-End Intelligent Multi-Agent System for Automated Single-Cell Data Analysis and Method Design**
-
 
 
 ## 📋 Table of Contents
@@ -27,7 +25,7 @@ BioForge is a cutting-edge **end-to-end** multi-agent framework that revolutioni
 
 ## 🚀 Installation
 
-### Virtual Environment Setup
+### ✨ Virtual Environment Setup
 
 Before installation, create and activate a virtual environment:
 
@@ -44,7 +42,7 @@ bioforge_env\Scripts\activate
 source bioforge_env/bin/activate
 ```
 
-### Quick Installation (Recommended)
+### 📦 Quick Installation (Recommended)
 
 ```bash
 # 1. Clone repository
@@ -66,7 +64,7 @@ cp env.example .env
 python start.py
 ```
 
-### Manual Installation (Alternative)
+### ⚙️ Manual Installation (Alternative)
 
 If automated installation fails, try manual installation:
 
@@ -82,17 +80,17 @@ cp env.example .env
 # Edit .env with your API keys
 ```
 
-### Prerequisites
+### 🔑 Prerequisites
 
 - **Python**: 3.8 or higher (3.9 recommended)
 - **Memory**: 8GB RAM minimum (16GB+ recommended)
 - **Storage**: 10GB free space
 - **API Keys**: OpenAI, Anthropic, or other LLM service API key
-- **Docker**: For code generation (optional)
-
+- **Docker**: For code generation
+  
 ## ⚡ Quick Start
 
-### 1. Verify Installation
+### 1️⃣ Verify Installation
 
 Run the quick start check to ensure everything is properly set up:
 
@@ -108,7 +106,7 @@ This will check:
 - ✅ Basic functionality
 - ✅ Virtual environment status
 
-### 2. Configure API Keys
+### 2️⃣ Configure API Keys
 
 **Step 1: Copy the environment template to project root directory:**
 
@@ -157,7 +155,7 @@ MAX_TOKENS=4096000
 - **GitHub**: [https://github.com/settings/tokens](https://github.com/settings/tokens)
 - **SerpAPI**: [https://serpapi.com/](https://serpapi.com/)
 
-### 3. Run BioForge
+### 3️⃣ Run BioForge
 
 **Complete Workflow:**
 ```bash
@@ -269,7 +267,7 @@ docker run -p 6333:6333 qdrant/qdrant
 curl http://localhost:6333/collections
 ```
 
-**8. Docker Issues (for agentic coder)**
+**8. Docker Issues**
 ```bash
 # Check if Docker is running
 docker --version
