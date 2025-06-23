@@ -373,10 +373,10 @@ docker ps
 If you use BioForge in your research, please cite:
 
 ```bibtex
-@article{bioForge2024,
+@article{bioForge2025,
     title = {BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration},
     author = {Tang, Xiangru and Yu, Zhuoyun and Chen, Jiapeng and Cui, Yan and Shao, Daniel and Wu, Fang and Wang, Weixu and Huang, Zhi and Cohan, Arman and Krishnaswamy, Smita and Gerstein, Mark},
-    year = {2024},
+    year = {2025},
     journal = {arXiv preprint}
 }
 ```
