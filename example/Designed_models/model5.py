@@ -374,11 +374,17 @@ def main():
     metrics = evaluate_model(model, test_loader, device, ctrl_data)
     
     
-    os.makedirs("./results/cite_analysis", exist_ok=True)
-    os.makedirs("./models/cite", exist_ok=True)
+    # 使用相对路径，基于项目根目录
+    project_root = Path(__file__).parent.parent.parent  # 项目根目录
+    results_dir = project_root / "results" / "cite_analysis"
+    models_dir = project_root / "results" / "models" / "cite"
+    
+    # 创建目录（如果不存在）
+    results_dir.mkdir(parents=True, exist_ok=True)
+    models_dir.mkdir(parents=True, exist_ok=True)
     
     
-    model.save_model("./models/cite/xgb_model.json")
+    model.save_model(str(models_dir / "xgb_model.json"))
     
     
     model_params = {
@@ -386,17 +392,17 @@ def main():
         'protein_dim': protein_train.shape[1],
         'metrics': metrics
     }
-    with open("./models/cite/xgb_params.json", 'w') as f:
+    with open(models_dir / "xgb_params.json", 'w') as f:
         json.dump(model_params, f)
     
     
     results_df = pd.DataFrame([metrics])
-    results_df.to_csv("./results/cite_analysis/perturbation_analysis_xgb.csv", index=False)
+    results_df.to_csv(results_dir / "perturbation_analysis_xgb.csv", index=False)
     display(results_df)
     print("\nAnalysis complete!")
-    print("Model saved to ./models/cite/xgb_model.json")
-    print("Parameters saved to ./models/cite/xgb_params.json")
-    print("Results saved to ./results/cite_analysis/perturbation_analysis_xgb.csv")
+    print(f"Model saved to {models_dir / 'xgb_model.json'}")
+    print(f"Parameters saved to {models_dir / 'xgb_params.json'}")
+    print(f"Results saved to {results_dir / 'perturbation_analysis_xgb.csv'}")
 
 if __name__ == "__main__":
     main() 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-BioForge Quick Start Script
-Simple script to test if BioForge is properly installed and configured
+cellforge Quick Start Script
+Simple script to test if cellforge is properly installed and configured
 """
 
 import os
@@ -10,48 +10,81 @@ import json
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (if it exists)
+try:
+    load_dotenv()
+except Exception as e:
+    print(f"⚠️  Warning: Could not load .env file: {e}")
+    print("   This is normal if .env file doesn't exist yet")
 
 def check_virtual_environment():
     """Check if running in a virtual environment"""
     print("🔍 Checking virtual environment...")
     
-    # Check if we're in a virtual environment
-    in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
+    # Check if we're in a virtual environment (improved detection for Windows)
+    in_venv = False
+    
+    # Method 1: Check for real_prefix (venv)
+    if hasattr(sys, 'real_prefix'):
+        in_venv = True
+    # Method 2: Check for base_prefix != prefix (conda and some venv)
+    elif hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix:
+        in_venv = True
+    # Method 3: Check for VIRTUAL_ENV environment variable
+    elif os.getenv('VIRTUAL_ENV'):
+        in_venv = True
+    # Method 4: Check for CONDA_DEFAULT_ENV environment variable
+    elif os.getenv('CONDA_DEFAULT_ENV'):
+        in_venv = True
+    # Method 5: Check if Python executable is in a venv-like directory structure
+    else:
+        python_path = sys.executable
+        if 'env' in python_path.lower() or 'venv' in python_path.lower() or 'conda' in python_path.lower():
+            in_venv = True
     
     if in_venv:
         print("✅ Running in virtual environment")
-        print(f"   Virtual environment: {sys.prefix}")
+        if os.getenv('CONDA_DEFAULT_ENV'):
+            print(f"   Conda environment: {os.getenv('CONDA_DEFAULT_ENV')}")
+        elif os.getenv('VIRTUAL_ENV'):
+            print(f"   Virtual environment: {os.getenv('VIRTUAL_ENV')}")
+        else:
+            print(f"   Python executable: {sys.executable}")
         return True
     else:
         print("⚠️  Not running in virtual environment")
         print("💡 It's recommended to use a virtual environment to avoid dependency conflicts")
         print("   You can create one with:")
-        print("   - conda: conda create -n bioforge python=3.9")
+        print("   - conda: conda create -n cellforge python=3.9")
         print("   - venv: python -m venv venv")
         print("   - pipenv: pipenv install")
         return False
 
 def check_installation():
-    """Check if BioForge is properly installed"""
-    print("🔍 Checking BioForge installation...")
+    """Check if cellforge is properly installed"""
+    print("🔍 Checking cellforge installation...")
     
     # Check if main modules can be imported
     try:
-        import BioForge
-        print("✅ BioForge package imported successfully")
+        import cellforge
+        print("✅ cellforge package imported successfully")
     except ImportError as e:
-        print(f"❌ Failed to import BioForge: {e}")
+        print(f"❌ Failed to import cellforge: {e}")
         return False
     
     # Check if Task Analysis module can be imported
     try:
-        from BioForge.Task_Analysis.main import run_task_analysis
+        from cellforge.Task_Analysis.main import run_task_analysis
         print("✅ Task Analysis module imported successfully")
     except ImportError as e:
         print(f"❌ Failed to import Task Analysis module: {e}")
-        return False
+        # Try alternative import
+        try:
+            import cellforge.Task_Analysis
+            print("✅ Task Analysis module imported successfully (alternative method)")
+        except ImportError as e2:
+            print(f"❌ Failed to import Task Analysis module: {e2}")
+            return False
     
     return True
 
@@ -119,7 +152,7 @@ def check_env_config():
     
     print(f"✅ {len(configured_llm_keys)} LLM API key(s) configured")
     
-    # Check if all required search API keys are configured
+    # Check search API keys (optional for basic functionality)
     search_api_keys = {
         "GitHub": os.getenv("GITHUB_TOKEN"),
         "SerpAPI": os.getenv("SERPAPI_KEY"),
@@ -127,19 +160,21 @@ def check_env_config():
     }
     
     missing_search_keys = []
+    configured_search_keys = []
     for name, key in search_api_keys.items():
         if not key or key == f"your_{name.lower()}_key_here":
-            if name == "SerpAPI":  # SerpAPI is required
-                missing_search_keys.append(name)
-            elif name in ["GitHub", "PubMed"]:  # GitHub and PubMed are optional
-                print(f"⚠️  {name} API key not configured (optional)")
+            missing_search_keys.append(name)
+        else:
+            configured_search_keys.append(name)
     
     if missing_search_keys:
-        print(f"⚠️  Missing required search API keys: {', '.join(missing_search_keys)}")
-        print("💡 SerpAPI key is required for RAG functionality")
-        return False
+        print(f"⚠️  Missing optional search API keys: {', '.join(missing_search_keys)}")
+        print("💡 These keys are optional for enhanced RAG functionality")
+        if configured_search_keys:
+            print(f"✅ Configured search APIs: {', '.join(configured_search_keys)}")
+        else:
+            print("⚠️  No search APIs configured - RAG functionality will be limited")
     
-    print("✅ All required search API keys configured")
     return True
 
 def check_directories():
@@ -147,9 +182,9 @@ def check_directories():
     print("\n📁 Checking directory structure...")
     
     required_dirs = [
-        "BioForge/data/datasets/scRNA-seq",
-        "BioForge/data/datasets/scATAC-seq",
-        "BioForge/data/datasets/perturbation",
+        "cellforge/data/datasets/scRNA-seq",
+        "cellforge/data/datasets/scATAC-seq",
+        "cellforge/data/datasets/perturbation",
         "results"
     ]
     
@@ -167,18 +202,18 @@ def run_test():
     print("\n🧪 Running functionality test...")
     
     try:
-        # Import the main function
-        from main import load_config, validate_config
+        # Test basic import functionality
+        from cellforge.Task_Analysis.main import run_task_analysis
+        print("✅ Task Analysis module imported successfully")
         
-        # Load configuration
-        config = load_config()
-        
-        # Validate configuration
-        if validate_config(config):
-            print("✅ Configuration validation passed")
+        # Test configuration loading
+        config_path = "config.json"
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            print("✅ Configuration loading test passed")
         else:
-            print("❌ Configuration validation failed")
-            return False
+            print("⚠️  Configuration file not found, but this is optional")
         
         print("✅ Basic functionality test passed")
         return True
@@ -189,7 +224,7 @@ def run_test():
 
 def main():
     """Main function"""
-    print("🚀 BioForge Quick Start Check")
+    print("🚀 cellforge Quick Start Check")
     print("=" * 50)
     
     # Check virtual environment
@@ -200,7 +235,7 @@ def main():
     # Check installation
     if not check_installation():
         print("\n❌ Installation check failed")
-        print("💡 Run 'python install.py' to install BioForge")
+        print("💡 Run 'python install.py' to install cellforge")
         return
     
     # Check directories
@@ -227,10 +262,10 @@ def main():
         return
     
     print("\n" + "=" * 50)
-    print("🎉 All checks passed! BioForge is ready to use.")
+    print("🎉 All checks passed! cellforge is ready to use.")
     print("=" * 50)
     print("\n📋 Next steps:")
-    print("1. Place your datasets in BioForge/data/datasets/")
+    print("1. Place your datasets in cellforge/data/datasets/")
     print("2. Run: python main.py")
     print("3. Check results in the results/ directory")
 

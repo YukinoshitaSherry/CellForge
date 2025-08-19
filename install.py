@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-BioForge Installation Script
+cellforge Installation Script
 Simplified installation and configuration process
 """
 
@@ -18,8 +18,12 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"])
     from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (if it exists)
+try:
+    load_dotenv()
+except Exception as e:
+    print(f"⚠️  Warning: Could not load .env file: {e}")
+    print("   This is normal if .env file doesn't exist yet")
 
 # Default task description - EDIT THIS VARIABLE TO CUSTOMIZE YOUR TASK
 DEFAULT_TASK_DESCRIPTION = """Your task is to develop a predictive model that accurately estimates gene expression profiles of individual K562 cells following CRISPR interference (CRISPRi), using the dataset from Norman et al. (2019, Science).
@@ -66,18 +70,41 @@ def check_virtual_environment():
     """Check if running in a virtual environment"""
     print("🔍 Checking virtual environment...")
     
-    # Check if we're in a virtual environment
-    in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
+    # Check if we're in a virtual environment (improved detection for Windows)
+    in_venv = False
+    
+    # Method 1: Check for real_prefix (venv)
+    if hasattr(sys, 'real_prefix'):
+        in_venv = True
+    # Method 2: Check for base_prefix != prefix (conda and some venv)
+    elif hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix:
+        in_venv = True
+    # Method 3: Check for VIRTUAL_ENV environment variable
+    elif os.getenv('VIRTUAL_ENV'):
+        in_venv = True
+    # Method 4: Check for CONDA_DEFAULT_ENV environment variable
+    elif os.getenv('CONDA_DEFAULT_ENV'):
+        in_venv = True
+    # Method 5: Check if Python executable is in a venv-like directory structure
+    else:
+        python_path = sys.executable
+        if 'env' in python_path.lower() or 'venv' in python_path.lower() or 'conda' in python_path.lower():
+            in_venv = True
     
     if in_venv:
         print("✅ Running in virtual environment")
-        print(f"   Virtual environment: {sys.prefix}")
+        if os.getenv('CONDA_DEFAULT_ENV'):
+            print(f"   Conda environment: {os.getenv('CONDA_DEFAULT_ENV')}")
+        elif os.getenv('VIRTUAL_ENV'):
+            print(f"   Virtual environment: {os.getenv('VIRTUAL_ENV')}")
+        else:
+            print(f"   Python executable: {sys.executable}")
         return True
     else:
         print("⚠️  Not running in virtual environment")
         print("💡 It's recommended to use a virtual environment to avoid dependency conflicts")
         print("   You can create one with:")
-        print("   - conda: conda create -n bioforge python=3.9")
+        print("   - conda: conda create -n cellforge python=3.9")
         print("   - venv: python -m venv venv")
         print("   - pipenv: pipenv install")
         
@@ -94,12 +121,12 @@ def create_directories():
     print("📁 Creating directory structure...")
     
     directories = [
-        "BioForge/data/datasets/scRNA-seq",
-        "BioForge/data/datasets/scATAC-seq", 
-        "BioForge/data/datasets/perturbation",
-        "BioForge/data/papers/pdf",
-        "BioForge/data/code",
-        "BioForge/data/results",
+        "cellforge/data/datasets/scRNA-seq",
+        "cellforge/data/datasets/scATAC-seq", 
+        "cellforge/data/datasets/perturbation",
+        "cellforge/data/papers/pdf",
+        "cellforge/data/code",
+        "cellforge/data/results",
         "results",
         "logs"
     ]
@@ -134,16 +161,16 @@ def install_dependencies():
     """Install Python dependencies"""
     print("📦 Installing Python dependencies...")
     
-    # First install core dependencies
-    if not run_command("pip install --upgrade pip setuptools wheel", "Upgrading pip, setuptools, and wheel"):
+    # First install core dependencies using python -m pip to avoid permission issues
+    if not run_command(f"{sys.executable} -m pip install --upgrade pip setuptools wheel", "Upgrading pip, setuptools, and wheel"):
         return False
     
     # Install requirements.txt
     if not run_command("pip install -r requirements.txt", "Installing requirements"):
         return False
     
-    # Install BioForge in development mode
-    if not run_command("pip install -e .", "Installing BioForge in development mode"):
+    # Install cellforge in normal mode (not development mode)
+    if not run_command("pip install .", "Installing cellforge"):
         return False
     
     return True
@@ -154,7 +181,7 @@ def create_config_file():
     
     config_content = {
         "task_description": DEFAULT_TASK_DESCRIPTION,
-        "dataset_path": "BioForge/data/datasets/",
+        "dataset_path": "cellforge/data/datasets/",
         "output_dir": "results/",
         "llm_config": {
             "provider": "openai",
@@ -182,25 +209,25 @@ def verify_installation():
     
     # Test imports
     try:
-        import BioForge
-        print("✅ BioForge package imported successfully")
+        import cellforge
+        print("✅ cellforge package imported successfully")
     except ImportError as e:
-        print(f"❌ Failed to import BioForge: {e}")
+        print(f"❌ Failed to import cellforge: {e}")
         return False
     
     # Test basic functionality
     try:
-        from BioForge.Task_Analysis.main import run_task_analysis
-        print("✅ BioForge functions imported successfully")
+        from cellforge.Task_Analysis.main import run_task_analysis
+        print("✅ cellforge functions imported successfully")
     except ImportError as e:
-        print(f"❌ Failed to import BioForge functions: {e}")
+        print(f"❌ Failed to import cellforge functions: {e}")
         return False
     
     return True
 
 def main():
     """Main installation function"""
-    print("🚀 BioForge Installation Script")
+    print("🚀 cellforge Installation Script")
     print("=" * 50)
     
     # Check Python version
@@ -230,13 +257,13 @@ def main():
         print("❌ Installation verification failed")
         sys.exit(1)
     
-    print("\n🎉 BioForge installation completed!")
+    print("\n🎉 cellforge installation completed!")
     print("\n📋 Next steps:")
     print("1. 📝 Edit .env file to set your API keys")
     print("   📍 Location: .env (project root directory)")
     print("   🔑 Required: At least one LLM API key + SerpAPI key")
     print("2. ✏️  To customize your task, edit the DEFAULT_TASK_DESCRIPTION variable in main.py")
-    print("3. 📁 Place your datasets in BioForge/data/datasets/ directory")
+    print("3. 📁 Place your datasets in cellforge/data/datasets/ directory")
     print("4. 🚀 Run: python main.py")
     print("5. ✅ Verify setup: python start.py")
     print("\n📚 For more information, see README.md")

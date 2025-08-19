@@ -436,11 +436,19 @@ def main():
     results = evaluate_and_save_model(model, test_loader, device)
     
     
+    # 使用相对路径，基于项目根目录
+    project_root = Path(__file__).parent.parent.parent  # 项目根目录
+    results_dir = project_root / "results"
+    
+    # 创建目录（如果不存在）
+    results_dir.mkdir(parents=True, exist_ok=True)
+    
     import json
-    with open('evaluation_results.json', 'w') as f:
+    results_file = results_dir / "evaluation_results.json"
+    with open(results_file, 'w') as f:
         json.dump(results, f, indent=4)
     
-    print("\nEvaluation results saved to evaluation_results.json")
+    print(f"\nEvaluation results saved to {results_file}")
 
 if __name__ == "__main__":
     main()

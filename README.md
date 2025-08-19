@@ -18,9 +18,9 @@
 
 ## 🎯 Overview
 
-BioForge is a cutting-edge **end-to-end** multi-agent framework that revolutionizes single-cell data analysis through intelligent task decomposition, automated method design, and collaborative problem-solving. The system integrates advanced agentic technique and domain-specific expertise to provide comprehensive solutions for single-cell genomics challenges.
+CellForge is a cutting-edge **end-to-end** multi-agent framework that revolutionizes single-cell data analysis through intelligent task decomposition, automated method design, and collaborative problem-solving. The system integrates advanced agentic technique and domain-specific expertise to provide comprehensive solutions for single-cell genomics challenges.
 
-![BioForge Workflow](./figs/Bioforge_workflow.png)
+![CellForge Workflow](./figs/Cellforge_workflow.png)
 
 ## 🚀 Installation
 
@@ -30,15 +30,15 @@ Before installation, create and activate a virtual environment:
 
 ```bash
 # Create virtual environment
-conda create -n bioforge python=3.9
-conda activate bioforge
+conda create -n cellforge python=3.9
+conda activate cellforge
 
 # Or using venv (Python built-in)
-python -m venv bioforge_env
+python -m venv cellforge_env
 # On Windows:
-bioforge_env\Scripts\activate
+cellforge_env\Scripts\activate
 # On macOS/Linux:
-source bioforge_env/bin/activate
+source cellforge_env/bin/activate
 ```
 
 ### 📦 Quick Installation (Recommended)
@@ -46,11 +46,11 @@ source bioforge_env/bin/activate
 ```bash
 # 1. Clone repository
 git clone https://github.com/gersteinlab/scAgents.git
-cd BioForge
+cd CellForge
 
 # 2. Create and activate virtual environment
-conda create -n bioforge python=3.9
-conda activate bioforge
+conda create -n cellforge python=3.9
+conda activate cellforge
 
 # 3. Run automated installation
 python install.py
@@ -69,9 +69,9 @@ If automated installation fails, try manual installation:
 
 ```bash
 # 1. Install minimal dependencies
-pip install -r requirements-minimal.txt
+pip install -r requirements.txt
 
-# 2. Install BioForge
+# 2. Install CellForge
 pip install -e .
 
 # 3. Configure environment
@@ -98,7 +98,7 @@ python start.py
 ```
 
 This will check:
-- ✅ BioForge installation
+- ✅ CellForge installation
 - ✅ Directory structure
 - ✅ Environment configuration (.env file)
 - ✅ Configuration file
@@ -110,8 +110,8 @@ This will check:
 **Step 1: Copy the environment template to project root directory:**
 
 ```bash
-# Make sure you're in the BioForge project root directory
-cd /path/to/your/BioForge
+# Make sure you're in the CellForge project root directory
+cd /path/to/your/CellForge
 cp .env.example .env
 ```
 
@@ -152,12 +152,12 @@ MAX_TOKENS=4096000
 
 ## 3️⃣ Initialize Project
 
-### 🔧 Initialize BioForge
+### 🔧 Initialize CellForge
 
 ```bash
 python main.py --init
 ```
-> **💡 What this does**: Creates a default `config.json` file with standard settings, sets up the basic project structure, and prepares BioForge for first-time use. Run this command if you're starting fresh or if the configuration file is missing.
+> **💡 What this does**: Creates a default `config.json` file with standard settings, sets up the basic project structure, and prepares CellForge for first-time use. Run this command if you're starting fresh or if the configuration file is missing.
 
 
 
@@ -165,9 +165,9 @@ python main.py --init
 
 **Where to Modify Task Description:**
 
-The task description is defined in the `BioForge/main.py` file. To customize your analysis task:
+The task description is defined in the `CellForge/main.py` file. To customize your analysis task:
 
-1. **Edit the DEFAULT_TASK_DESCRIPTION variable** in `BioForge/main.py` (around line 30):
+1. **Edit the DEFAULT_TASK_DESCRIPTION variable** in `CellForge/main.py` (around line 30):
 
 ```python
 # Default task description - EDIT THIS VARIABLE TO CUSTOMIZE YOUR TASK
@@ -195,7 +195,7 @@ Evaluation Metrics:
 ```json
 {
   "task_description": "Your custom task description here...",
-  "dataset_path": "BioForge/data/datasets/",
+  "dataset_path": "cellforge/data/datasets/",
   "output_dir": "results/",
   "llm_config": {
     "provider": "openai",
@@ -229,14 +229,14 @@ Evaluation Metrics:
 
 **Where to Place Your Datasets:**
 
-1. **Dataset root filepath shuold be**: `BioForge/data/datasets/`
+1. **Dataset root filepath shuold be**: `cellforge/data/datasets/`
 
 2. **Supported Dataset Formats**:
    You can download Datasets from [scPerturb](https://projects.sanderlab.org/scperturb/)** (recommended) or using other `.h5ad` (AnnData format) datasets.
 
 4. **Dataset Directory Structure**:
 ```
-BioForge/data/datasets/
+cellforge/data/datasets/
 ├── your_dataset_1.h5ad
 └── subfolder/ # eg scATAC-seq dataset folder downloded from scPerturb
     └── nested_dataset.h5ad
@@ -306,7 +306,7 @@ echo $VIRTUAL_ENV  # Should show venv path
 
 # If not activated, activate it:
 # For conda:
-conda activate bioforge
+conda activate cellforge
 # For venv:
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
@@ -315,8 +315,8 @@ venv\Scripts\activate     # Windows
 **2. Import Errors**
 ```bash
 # Ensure you're in the correct directory and venv is activated
-cd BioForge
-conda activate bioforge  # or source venv/bin/activate
+cd CellForge
+conda activate cellforge  # or source venv/bin/activate
 pip install -e .
 ```
 
@@ -329,14 +329,14 @@ cat .env | grep API_KEY
 **4. Missing Dependencies**
 ```bash
 # Reinstall dependencies in your virtual environment
-conda activate bioforge  # or source venv/bin/activate
+conda activate cellforge  # or source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 **5. Dataset Path Issues**
 ```bash
 # Check dataset directory structure
-ls -la BioForge/data/datasets/
+ls -la cellforge/data/datasets/
 ```
 
 **6. Environment Configuration**
@@ -370,11 +370,11 @@ docker ps
 
 ## 📚 Citation
 
-If you use BioForge in your research, please cite:
+If you use CellForge in your research, please cite:
 
 ```bibtex
-@article{bioForge2025,
-    title = {BioForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration},
+@article{cellForge2025,
+    title = {CellForge: Open-Ended Autonomous Design of Computational Methods for Single-Cell Omics via Multi-Agent Collaboration},
     author = {Tang, Xiangru and Yu, Zhuoyun and Chen, Jiapeng and Cui, Yan and Shao, Daniel and Wu, Fang and Wang, Weixu and Huang, Zhi and Cohan, Arman and Krishnaswamy, Smita and Gerstein, Mark},
     year = {2025},
     journal = {arXiv preprint}
