@@ -79,36 +79,36 @@ class CollaborationSystem:
             Comprehensive analysis report
         """
         
-        rag_results = self.rag_system.search(task_description)  # 只传递 query 参数
+        rag_results = self.rag_system.search(task_description)  
         
         
         dataset_analysis = self.dataset_analyst.analyze_dataset(
             task_description,
             dataset_info,
-            rag_results  # rag_results 是列表，不是字典
+            rag_results  
         )
         
         problem_investigation = self.problem_investigator.investigate_problem(
             task_description,
             dataset_info,
-            rag_results  # rag_results 是列表，不是字典
+            rag_results  
         )
         
         baseline_assessment = self.baseline_assessor.assess_baselines(
             task_description,
             dataset_info,
-            rag_results  # rag_results 是列表，不是字典
+            rag_results  
         )
         
         
-        # Generate final report
+        
         final_report = self.refinement_agent.refine_analysis(
             dataset_analysis,
             problem_investigation,
             baseline_assessment
         )
         
-        # Save the report to JSON file
+        
         self._save_report(final_report, task_description, dataset_info)
         
         return final_report
@@ -120,23 +120,23 @@ class CollaborationSystem:
             import json
             from datetime import datetime
             
-            # Create results directory
+            
             results_dir = Path("cellforge/Task_Analysis/results")
             results_dir.mkdir(parents=True, exist_ok=True)
             
-            # Generate timestamp for filename
+            
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             
-            # Create filename
+            
             filename = f"task_analysis_{timestamp}.json"
             file_path = results_dir / filename
             
-            # Prepare report data for JSON serialization
+            
             report_data = {
                 "timestamp": timestamp,
                 "task_description": task_description,
                 "dataset_info": dataset_info,
-                "task_type": "gene_knockout",  # Default task type
+                "task_type": "gene_knockout",  
                 "analysis_results": {
                     "dataset_analysis": report.dataset_analysis.to_dict() if hasattr(report.dataset_analysis, 'to_dict') else str(report.dataset_analysis),
                     "problem_investigation": report.problem_investigation.to_dict() if hasattr(report.problem_investigation, 'to_dict') else str(report.problem_investigation),
@@ -149,7 +149,7 @@ class CollaborationSystem:
                 }
             }
             
-            # Save to JSON file
+            
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(report_data, f, indent=2, ensure_ascii=False)
             
@@ -157,7 +157,7 @@ class CollaborationSystem:
             
         except Exception as e:
             print(f"⚠️ Warning: Could not save task analysis report: {e}")
-            # Continue execution even if save fails
+            
     
     def _retrieve_relevant_papers(self, query: str, top_k: int = 10) -> List[Dict[str, Any]]:
         """
@@ -171,14 +171,14 @@ class CollaborationSystem:
             List of relevant papers with metadata
         """
         
-        rag_results = self.rag_system.search(query)  # 只传递 query 参数
+        rag_results = self.rag_system.search(query)  
         
         
         papers = []
-        for result in rag_results[:top_k]:  # rag_results 是列表
+        for result in rag_results[:top_k]:  
             papers.append({
                 "title": result.get("title", ""),
-                "abstract": result.get("content", result.get("snippet", "")),  # 修复abstract字段
+                "abstract": result.get("content", result.get("snippet", "")),  
                 "metadata": result.get("metadata", {}),
                 "score": result.get("score", 0.0)
             })
@@ -199,18 +199,18 @@ class CollaborationSystem:
         
         try:
             response = self.llm.generate(prompt, system_prompt)
-            # Parse the response content as JSON
+            
             try:
                 return json.loads(response["content"])
             except json.JSONDecodeError:
-                # If direct parsing fails, try to extract JSON from markdown code blocks
+                
                 import re
                 content = response["content"]
                 json_match = re.search(r'```json\n(.*?)\n```', content, re.DOTALL)
                 if json_match:
                     return json.loads(json_match.group(1))
                 else:
-                    # Return the raw content if JSON parsing fails
+                    
                     return {"content": content, "error": "Failed to parse JSON response"}
         except Exception as e:
             raise Exception(f"LLM generation failed: {str(e)}")

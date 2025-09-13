@@ -92,7 +92,7 @@ def read_txt(file_path):
     """read the txt file and return the basic information"""
     try:
         with open(file_path, 'r') as f:
-            lines = f.readlines()[:10]  # Only read first 10 lines
+            lines = f.readlines()[:10]  
             info = {
                 "type": "txt",
                 "preview": lines,
@@ -231,8 +231,8 @@ def explore_directory(directory):
     return results
 
 def main():
-    # 使用相对路径，基于项目根目录
-    project_root = Path(__file__).parent.parent  # cellforge目录
+    
+    project_root = Path(__file__).parent.parent  
     base_dir = project_root / "data" / "datasets" / "MimitouSmibert2021"
     
     print(f"start exploring the directory: {base_dir}")
@@ -243,7 +243,7 @@ def main():
     
     results = explore_directory(str(base_dir))
     
-    # save the results to the json file
+    
     output_file = project_root / "data" / "datasets" / "mimitou_data_info.json"
     
     try:
@@ -253,7 +253,7 @@ def main():
     except Exception as e:
         print(f"❌ Could not save data info: {e}")
     
-    # print the summary information
+    
     print("\nsummary information:")
     for folder in os.listdir(base_dir):
         folder_path = os.path.join(base_dir, folder)
@@ -262,7 +262,7 @@ def main():
             folder_files = [f for f in results.keys() if f.startswith(folder)]
             print(f"   number of files: {len(folder_files)}")
             
-            # show the number of each file type
+            
             file_types = {}
             for f in folder_files:
                 file_type = results[f].get("type", "unknown")
@@ -276,8 +276,8 @@ class MultiView:
     
     def __init__(self, datasets_dir: str = None):
         if datasets_dir is None:
-            # 使用相对路径，基于项目根目录
-            project_root = Path(__file__).parent.parent  # cellforge目录
+            
+            project_root = Path(__file__).parent.parent  
             self.datasets_dir = project_root / "data" / "datasets"
         else:
             self.datasets_dir = Path(datasets_dir)

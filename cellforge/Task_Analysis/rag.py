@@ -15,14 +15,14 @@ except ImportError:
     GITHUB_AVAILABLE = False
     print("⚠️  PyGithub not available. GitHub search will be disabled.")
 
-# Try relative imports first, fall back to absolute imports
+
 try:
     from .dataparser import DataParser
     from .indexer import VectorIndexer
     from .search import HybridSearcher, SearchResult
     from .utils import TextProcessor
 except ImportError:
-    # Fall back to absolute imports for standalone execution
+    
     import sys
     sys.path.append(str(Path(__file__).parent))
     from dataparser import DataParser
@@ -36,11 +36,11 @@ class RAGSystem:
     Implements Agentic Retrieval with BFS-DFS alternating search strategy and dual Qdrant databases.
     """
     def __init__(self, qdrant_url: str = "localhost", qdrant_port: int = 6333):
-        # Load configuration
+        
         with open('config.json', 'r') as f:
             config = json.load(f)
         
-        # Initialize dual Qdrant clients
+        
         self.qdrant_main = None
         self.qdrant_tmp = None
         
@@ -58,40 +58,40 @@ class RAGSystem:
         except Exception as e:
             print(f"Error initializing Qdrant clients: {e}")
         
-        # API tokens
+        
         self.github_token = os.getenv("GITHUB_TOKEN")
         self.serpapi_key = os.getenv("SERPAPI_KEY")
         self.pubmed_api_key = os.getenv("PUBMED_API_KEY")
         self.pubmed_tool = os.getenv("PUBMED_TOOL", "cellforge")
         self.pubmed_email = os.getenv("PUBMED_EMAIL")
         
-        # 初始化组件，使用现有的目录结构
-        project_root = Path(__file__).parent.parent  # cellforge目录
+        
+        project_root = Path(__file__).parent.parent  
         results_dir = project_root / "data" / "results"
         
         self.text_processor = TextProcessor()
         self.paper_parser = DataParser(output_path=str(results_dir))
-        self.vector_indexer = VectorIndexer()  # Uses dual Qdrant databases from config
-        self.hybrid_searcher = HybridSearcher()  # Uses dual Qdrant databases from config
+        self.vector_indexer = VectorIndexer()  
+        self.hybrid_searcher = HybridSearcher()  
         
-        # GitHub client
+        
         if self.github_token and self.github_token != "your_github_token_here":
             self.github_client = Github(self.github_token)
         else:
             self.github_client = None
             print("GitHub token not configured, GitHub search will be disabled")
         
-        # Load single cell terms
+        
         self._load_single_cell_terms()
         
-        # Initialize collections
+        
         self._initialize_collections()
     
     def _initialize_collections(self):
         """Initialize collections for Task Analysis in both databases"""
         collections = [
-            'papers',  # 添加 papers 集合
-            'code',    # 添加 code 集合
+            'papers',  
+            'code',    
             'task_analysis_dataparser',
             'task_analysis_dataset_analyst', 
             'task_analysis_problem_investigator',
@@ -102,7 +102,7 @@ class RAGSystem:
         
         for collection in collections:
             try:
-                # Initialize in main database
+                
                 if self.qdrant_main:
                     self.qdrant_main.recreate_collection(
                         collection_name=collection,
@@ -116,7 +116,7 @@ class RAGSystem:
                 print(f"Error initializing collection {collection} in main DB: {str(e)}")
             
             try:
-                # Initialize in tmp database
+                
                 if self.qdrant_tmp:
                     self.qdrant_tmp.recreate_collection(
                         collection_name=collection,
@@ -151,15 +151,15 @@ class RAGSystem:
             return []
         
         try:
-            # Use hybrid searcher for Agentic Retrieval
+            
             results = self.hybrid_searcher.search(query, search_type="agentic", limit=limit)
             
-            # Convert to standard format
+            
             search_results = []
             for result in results:
                 search_results.append({
                     "title": result.title,
-                    "content": result.snippet,  # SearchResult 使用 snippet 而不是 content
+                    "content": result.snippet,  
                     "url": result.url,
                     "score": result.score,
                     "metadata": result.metadata or {},
@@ -195,13 +195,13 @@ class RAGSystem:
         try:
             collection_name = f"task_analysis_{result_type}"
             
-            # Encode content
+            
             content = str(data)
             from sentence_transformers import SentenceTransformer
             encoder = SentenceTransformer('all-MiniLM-L6-v2')
             embedding = encoder.encode(content)
             
-            # Create point
+            
             from qdrant_client.http import models
             point = models.PointStruct(
                 id=hash(content),
@@ -214,7 +214,7 @@ class RAGSystem:
                 }
             )
             
-            # Store to database
+            
             qdrant_client.upsert(
                 collection_name=collection_name,
                 points=[point]
@@ -252,7 +252,7 @@ class RAGSystem:
             collection_name = f"task_analysis_{result_type}"
             
             if query:
-                # Search with query
+                
                 from sentence_transformers import SentenceTransformer
                 encoder = SentenceTransformer('all-MiniLM-L6-v2')
                 query_embedding = encoder.encode(query)
@@ -263,13 +263,13 @@ class RAGSystem:
                     limit=limit
                 )
             else:
-                # Get all results
+                
                 results = qdrant_client.scroll(
                     collection_name=collection_name,
                     limit=limit
                 )[0]
             
-            # Convert to standard format
+            
             search_results = []
             for result in results:
                 search_results.append({
@@ -410,7 +410,7 @@ class RAGSystem:
             Dictionary with decision support information
         """
         try:
-            # Create decision support query
+            
             query_terms = []
             if task_description:
                 query_terms.extend(task_description.split()[:10])
@@ -422,10 +422,10 @@ class RAGSystem:
             
             decision_query = " ".join(query_terms) + " single cell perturbation analysis decision support"
             
-            # Search for decision support information
+            
             results = self.search(decision_query, limit=5)
             
-            # Format decision support information
+            
             decision_support = {
                 "data_preparation": {
                     "recommended_preprocessing": [],
@@ -444,7 +444,7 @@ class RAGSystem:
                 }
             }
             
-            # Extract information from search results
+            
             for result in results:
                 content = result.get("content", "")
                 if "preprocessing" in content.lower() or "normalization" in content.lower():
@@ -471,14 +471,14 @@ class RAGSystem:
             List of experimental design information
         """
         try:
-            # Create experimental design query
+            
             query_terms = task_description.split()[:8]
             design_query = " ".join(query_terms) + " experimental design single cell perturbation"
             
-            # Search for experimental design information
+            
             results = self.search(design_query, limit=3)
             
-            # Convert to experimental design format
+            
             designs = []
             for result in results:
                 designs.append({
@@ -505,14 +505,14 @@ class RAGSystem:
             List of implementation guide information
         """
         try:
-            # Create implementation guide query
+            
             query_terms = task_description.split()[:8]
             guide_query = " ".join(query_terms) + " implementation guide model architecture"
             
-            # Search for implementation guide information
+            
             results = self.search(guide_query, limit=3)
             
-            # Convert to implementation guide format
+            
             guides = []
             for result in results:
                 guides.append({
@@ -539,14 +539,14 @@ class RAGSystem:
             List of evaluation framework information
         """
         try:
-            # Create evaluation framework query
+            
             query_terms = task_description.split()[:8]
             eval_query = " ".join(query_terms) + " evaluation framework metrics assessment"
             
-            # Search for evaluation framework information
+            
             results = self.search(eval_query, limit=3)
             
-            # Convert to evaluation framework format
+            
             frameworks = []
             for result in results:
                 frameworks.append({

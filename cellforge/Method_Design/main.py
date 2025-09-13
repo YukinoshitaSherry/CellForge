@@ -13,7 +13,6 @@ from pathlib import Path
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    # 明确指定.env文件路径
     env_path = Path(__file__).parent.parent.parent / ".env"
     load_dotenv(env_path)
     print(f"Loaded .env from: {env_path}")

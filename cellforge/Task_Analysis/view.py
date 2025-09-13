@@ -54,11 +54,11 @@ class View:
         print("\nSample variable data (first 5 genes):")
         print(self.adata.var.head(n_genes))
 
-# Example usage with your actual dataset
+
 try:
     view = View()
-    # 使用相对路径，基于项目根目录
-    project_root = Path(__file__).parent.parent  # cellforge目录
+    
+    project_root = Path(__file__).parent.parent  
     dataset_path = project_root / "data" / "datasets" / "NormanWeissman2019_filtered.h5ad"
     
     if dataset_path.exists():

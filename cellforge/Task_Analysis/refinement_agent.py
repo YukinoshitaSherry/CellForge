@@ -77,7 +77,7 @@ class RefinementAgent:
             dataset_analysis=refined_dataset,
             problem_investigation=refined_problem,
             baseline_assessment=refined_baseline,
-            refinement_comments=[],  # 暂时为空列表，后续可以添加
+            refinement_comments=[],  
             final_recommendations=recommendations,
             timestamp=datetime.now()
         )
@@ -726,18 +726,18 @@ Please provide final recommendations in the following JSON format:
         
         try:
             response = self.llm.generate(prompt, system_prompt)
-            # Parse the response content as JSON
+            
             try:
                 return json.loads(response["content"])
             except json.JSONDecodeError:
-                # If direct parsing fails, try to extract JSON from markdown code blocks
+                
                 import re
                 content = response["content"]
                 json_match = re.search(r'```json\n(.*?)\n```', content, re.DOTALL)
                 if json_match:
                     return json.loads(json_match.group(1))
                 else:
-                    # Return the raw content if JSON parsing fails
+                    
                     return {"content": content, "error": "Failed to parse JSON response"}
         except Exception as e:
             raise Exception(f"LLM generation failed: {str(e)}")
