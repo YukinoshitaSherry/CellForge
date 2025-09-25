@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 cellforge Main Entry Point
 End-to-End Intelligent Multi-Agent System for Automated Single-Cell Data Analysis and Method Design
@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 
-# Load environment variables from .env file (if it exists)
+
 env_file = Path(__file__).parent / ".env"
 try:
     if env_file.exists():
@@ -25,18 +25,18 @@ except Exception as e:
     print(f"⚠️  Warning: Could not load .env file: {e}")
     print("   This is normal if .env file doesn't exist yet")
 
-# Add project root to path
+
 project_root = Path(__file__).parent
 sys.path.append(str(project_root))
 
-# Import cellforge components
+
 try:
     from cellforge.llm import LLMInterface
 except ImportError:
     print("⚠️  cellforge package not found. Please run 'python install.py' first.")
     sys.exit(1)
 
-# Default task description - EDIT THIS VARIABLE TO CUSTOMIZE YOUR TASK
+
 DEFAULT_TASK_DESCRIPTION = """Your task is to develop a predictive model that accurately estimates gene expression profiles of individual K562 cells following CRISPR interference (CRISPRi), using the dataset from Norman et al. (2019, Science).
 
 Task Definition:
@@ -61,15 +61,15 @@ def load_config(config_path: str = "config.json") -> Dict[str, Any]:
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     else:
-        # Default configuration
+        
         default_config = {
             "task_description": DEFAULT_TASK_DESCRIPTION,
             "dataset_path": "cellforge/data/datasets/",
             "output_dir": "results/",
             "llm_config": {
-                "provider": "openai",  # openai, anthropic, local
+                "provider": "openai",  
                 "model": os.getenv("MODEL_NAME", "gpt-4"),
-                "api_key": "loaded_from_env"  # API keys are loaded from .env file
+                "api_key": "loaded_from_env"  
             },
             "workflow_phases": ["task_analysis", "method_design", "code_generation"],
             "qdrant_config": {
@@ -78,7 +78,7 @@ def load_config(config_path: str = "config.json") -> Dict[str, Any]:
             }
         }
         
-        # Save default configuration
+        
         with open(config_path, 'w', encoding='utf-8') as f:
             json.dump(default_config, f, ensure_ascii=False, indent=2)
         
@@ -87,7 +87,7 @@ def load_config(config_path: str = "config.json") -> Dict[str, Any]:
         print("💡 To customize your task, edit the DEFAULT_TASK_DESCRIPTION variable in main.py")
         return default_config
     
-    # Update task description from the variable if config exists
+    
     config["task_description"] = DEFAULT_TASK_DESCRIPTION
     return config
 
@@ -100,7 +100,7 @@ def validate_config(config: Dict[str, Any]) -> bool:
             print(f"❌ Configuration file missing required field: {field}")
             return False
     
-    # Check if at least one LLM API key is configured in .env file
+    
     llm_api_keys = [
         os.getenv("OPENAI_API_KEY"),
         os.getenv("ANTHROPIC_API_KEY"),
@@ -118,7 +118,7 @@ def validate_config(config: Dict[str, Any]) -> bool:
     
     print(f"✅ {len(configured_llm_keys)} LLM API key(s) configured")
     
-    # Check search API keys (optional for basic functionality)
+    
     search_api_keys = {
         "GitHub": os.getenv("GITHUB_TOKEN"),
         "SerpAPI": os.getenv("SERPAPI_KEY"),
@@ -152,7 +152,7 @@ def run_task_analysis(config: Dict[str, Any]) -> bool:
         
         from cellforge.Task_Analysis.main import run_task_analysis
         
-        # Prepare dataset info
+        
         dataset_info = {
             "dataset_path": config["dataset_path"],
             "dataset_name": "norman_2019_k562",
@@ -161,7 +161,7 @@ def run_task_analysis(config: Dict[str, Any]) -> bool:
             "perturbation_type": "CRISPRi"
         }
         
-        # Run task analysis
+        
         result = run_task_analysis(config["task_description"], dataset_info)
         
         if result:
@@ -182,16 +182,16 @@ def run_method_design(config: Dict[str, Any]) -> bool:
         print("PHASE 2: METHOD DESIGN")
         print("="*60)
         
-        # Import method design modules
+        
         from cellforge.Method_Design import generate_research_plan
         
-        # Load task analysis results
+        
         task_analysis_dir = Path("cellforge/Task_Analysis/results")
         if not task_analysis_dir.exists():
             print("❌ Task analysis results not found. Please run task analysis first.")
             return False
         
-        # Find latest task analysis report
+        
         task_reports = list(task_analysis_dir.glob("task_analysis_*.json"))
         if not task_reports:
             print("❌ No task analysis reports found. Please run task analysis first.")
@@ -199,27 +199,27 @@ def run_method_design(config: Dict[str, Any]) -> bool:
         
         latest_report = max(task_reports, key=lambda x: x.stat().st_mtime)
         
-        # Load task analysis
+        
         with open(latest_report, 'r', encoding='utf-8') as f:
             task_analysis = json.load(f)
         
-        # Generate research plan with automatic code generation
+        
         output_dir = "cellforge/data/results"
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         
         print("🔧 Generating research plan...")
         plan = generate_research_plan(
             task_analysis=task_analysis,
-            rag_retriever=None,  # Will be initialized in the module
+            rag_retriever=None,  
             task_type=task_analysis.get("task_type", "gene_knockout"),
             output_dir=output_dir,
-            auto_generate_code=True  # Enable automatic code generation
+            auto_generate_code=True  
         )
         
         if plan:
             print("✅ Method design completed")
             
-            # Show generated files
+            
             if 'generated_files' in plan:
                 files_info = plan['generated_files']
                 base_filename = files_info['base_filename']
@@ -229,7 +229,7 @@ def run_method_design(config: Dict[str, Any]) -> bool:
                 print(f"  - {output_dir}/{base_filename}.mmd (Architecture diagram)")
                 print(f"  - {output_dir}/{base_filename}_consensus.png (Consensus progress)")
                 
-                # Show code generation result
+                
                 if 'code_generation' in plan:
                     code_info = plan['code_generation']
                     if code_info['status'] == 'success':
@@ -258,20 +258,20 @@ def run_code_generation(config: Dict[str, Any]) -> bool:
         print("PHASE 3: CODE GENERATION")
         print("="*60)
         
-        # Check if code generation was already completed in method design phase
+        
         results_dir = Path("cellforge/data/results")
         if not results_dir.exists():
             print("❌ Results directory not found. Please run method design first.")
             return False
         
-        # Check for generated code file
+        
         code_file = results_dir / "result.py"
         if code_file.exists():
             print("✅ Code generation already completed in method design phase")
             print(f"📁 Generated code: {code_file}")
             return True
         
-        # Check for research plan files
+        
         plan_files = list(results_dir.glob("research_plan_*.json"))
         if not plan_files:
             print("❌ No research plans found. Please run method design first.")
@@ -280,7 +280,7 @@ def run_code_generation(config: Dict[str, Any]) -> bool:
         latest_plan = max(plan_files, key=lambda x: x.stat().st_mtime)
         print(f"📋 Found research plan: {latest_plan}")
         
-        # Import code generation module
+        
         try:
             from cellforge.Code_Generation import generate_code_from_plan
         except ImportError as e:
@@ -288,7 +288,7 @@ def run_code_generation(config: Dict[str, Any]) -> bool:
             print("💡 Code generation requires OpenHands setup")
             return False
         
-        # Generate code from plan
+        
         print("🔧 Generating code from research plan...")
         code_file_path = generate_code_from_plan(
             research_plan=json.load(open(latest_plan, 'r', encoding='utf-8')),
@@ -314,14 +314,14 @@ def run_complete_workflow(config: Dict[str, Any]) -> bool:
     print("🚀 Starting cellforge End-to-End Workflow")
     print("="*80)
     
-    # Validate configuration
+    
     if not validate_config(config):
         print("❌ Configuration validation failed, please check .env file")
         return False
     
     success = True
     
-    # Run each phase
+    
     for phase in config["workflow_phases"]:
         if phase == "task_analysis":
             success &= run_task_analysis(config)
@@ -357,8 +357,8 @@ def create_sample_dataset():
         Path(directory).mkdir(parents=True, exist_ok=True)
         print(f"  ✅ Created: {directory}")
     
-    # Create sample README
-    readme_content = """# Dataset Directory
+    
+    readme_content = """
 
 Please place your single-cell datasets in the appropriate directories:
 
@@ -366,7 +366,7 @@ Please place your single-cell datasets in the appropriate directories:
 - `scATAC-seq/`: Single-cell ATAC-seq data (.h5ad files)  
 - `perturbation/`: Drug perturbation data (.h5ad files)
 
-## Data Format Requirements
+
 
 Recommended AnnData format (.h5ad):
 - Gene expression matrix stored in `adata.X`
@@ -374,7 +374,7 @@ Recommended AnnData format (.h5ad):
 - Gene metadata stored in `adata.var`
 - Required annotations: cell type, condition, batch (if applicable)
 
-## Example Datasets
+
 
 You can download datasets from [scPerturb](https://projects.sanderlab.org/scperturb/):
 - Norman et al. (2019) K562 CRISPRi data
@@ -399,17 +399,17 @@ def main():
     if args.init:
         print("🚀 Initializing cellforge project...")
         create_sample_dataset()
-        load_config(args.config)  # Create default configuration
+        load_config(args.config)  
         print("\n✅ Project initialization completed!")
         print("📝 Please copy env.example to .env and configure your API keys")
         print("💡 To customize your task, edit the DEFAULT_TASK_DESCRIPTION variable in main.py")
         return
     
-    # Load configuration
+    
     config = load_config(args.config)
     
     if args.phase:
-        # Run specific phase
+        
         if args.phase == "task_analysis":
             run_task_analysis(config)
         elif args.phase == "method_design":
@@ -417,7 +417,7 @@ def main():
         elif args.phase == "code_generation":
             run_code_generation(config)
     else:
-        # Run complete workflow
+        
         run_complete_workflow(config)
 
 if __name__ == "__main__":
