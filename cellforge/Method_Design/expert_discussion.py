@@ -33,8 +33,7 @@ class ExpertDiscussion:
         self.discussion_history = []
         self.current_round = 0
         self.knowledge_cache = {}
-        
-        # 验证LLM配置（只在第一次初始化时）
+
         if not hasattr(ExpertDiscussion, '_llm_validated'):
             self._validate_llm_config()
             ExpertDiscussion._llm_validated = True
@@ -44,8 +43,7 @@ class ExpertDiscussion:
                              message_type: str,
                              context: List[DiscussionMessage] = None) -> str:
         """Generate context-aware prompt for expert discussion"""
-        
-        # 验证task analysis的完整性，但允许缺失字段
+
         required_fields = [
             'task_type', 'dataset', 'perturbations', 'cell_types',
             'objectives', 'constraints', 'evaluation_metrics'
@@ -53,10 +51,9 @@ class ExpertDiscussion:
         missing_fields = [f for f in required_fields if f not in task_analysis]
         if missing_fields:
             print(f"Warning: Task analysis missing fields: {', '.join(missing_fields)}")
-            # 为缺失字段提供默认值
+
             task_analysis = self._fill_missing_fields(task_analysis, missing_fields)
-            
-        # 构建详细的任务描述
+
         task_description = f"""Task Type: {task_analysis['task_type']}
 Dataset: {task_analysis['dataset']['name']} ({task_analysis['dataset'].get('type', 'Unknown type')})
 Dataset Description: {task_analysis['dataset'].get('description', 'No description provided')}
@@ -75,7 +72,6 @@ Constraints:
 Evaluation Metrics:
 {self._format_list(task_analysis['evaluation_metrics'])}"""
 
-        # 获取相关知识库内容
         knowledge_content = self._get_relevant_knowledge(
             expert_domain=expert_domain,
             task_type=task_analysis['task_type'],
@@ -99,7 +95,6 @@ DESIGN GOALS:
 
 Your role is to contribute your expertise in {expert_domain} to ensure these goals are met."""
 
-        # 添加知识库内容
         if knowledge_content:
             base_prompt += f"\n\nRELEVANT KNOWLEDGE:\n{knowledge_content}"
             
@@ -110,8 +105,6 @@ Your role is to contribute your expertise in {expert_domain} to ensure these goa
                 context_str += f"{msg.expert_name}: {msg.content}\n"
             base_prompt += context_str
 
-        # Add specific instructions based on message type
-        # 添加领域特定的背景知识
         domain_context = self._get_domain_context(expert_domain)
         base_prompt += f"\n\nDOMAIN CONTEXT:\n{domain_context}"
         
@@ -441,7 +434,6 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
         return output
 
     def _format_perturbations(self, perturbations: List[Dict[str, Any]]) -> str:
-        """格式化扰动信息"""
         formatted = []
         for p in perturbations:
             desc = f"- Type: {p['type']}\n"
@@ -453,25 +445,20 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
         return '\n'.join(formatted)
         
     def _format_list(self, items: List[str]) -> str:
-        """格式化列表项"""
+
         return '\n'.join(f"- {item}" for item in items)
         
     def _get_relevant_knowledge(self, expert_domain: str, task_type: str, message_type: str) -> str:
-        """从知识库检索相关内容"""
         if not self.rag_retriever:
             return ""
             
-        # 生成缓存键
         cache_key = f"{expert_domain}_{task_type}_{message_type}"
         
-        # 检查缓存
         if cache_key in self.knowledge_cache:
             return self.knowledge_cache[cache_key]
             
-        # 构建查询词
         query_terms = []
         
-        # 基于专家领域的查询词
         domain_queries = {
             "deep_learning": [
                 "neural network architecture",
@@ -496,11 +483,9 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
             ]
         }
         
-        # 添加领域特定查询词
         if expert_domain.lower() in domain_queries:
             query_terms.extend(domain_queries[expert_domain.lower()])
             
-        # 基于消息类型的查询词
         message_type_queries = {
             "proposal": [
                 "model architecture",
@@ -523,12 +508,10 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
                 "benchmark comparison"
             ]
         }
-        
-        # 添加消息类型特定查询词
+
         if message_type in message_type_queries:
             query_terms.extend(message_type_queries[message_type])
             
-        # 检索知识
         all_results = []
         for query in query_terms:
             try:
@@ -537,16 +520,15 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
             except Exception as e:
                 print(f"Warning: Knowledge retrieval failed for query '{query}': {e}")
                 
-        # 格式化结果
         if all_results:
             formatted_results = []
-            seen_content = set()  # 用于去重
+            seen_content = set()
             
             for result in all_results:
                 content = result.get("content", "")
                 if content and content not in seen_content:
                     score = result.get("relevance_score", 0.0)
-                    if score >= 0.5:  # 只包含相关性较高的结果
+                    if score >= 0.5:
                         formatted_results.append(f"Source: {result.get('source', 'Unknown')}")
                         formatted_results.append(f"Relevance: {score:.2f}")
                         formatted_results.append(f"Content: {content}\n")
@@ -554,7 +536,6 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
                         
             knowledge_content = "\n".join(formatted_results)
             
-            # 缓存结果
             self.knowledge_cache[cache_key] = knowledge_content
             
             return knowledge_content
@@ -562,7 +543,6 @@ Focus on potential for surpassing SOTA performance in single-cell perturbation p
         return ""
         
     def _get_domain_context(self, expert_domain: str) -> str:
-        """获取特定领域的背景知识"""
         domain_contexts = {
             "deep_learning": """
 Key Considerations for Deep Learning in Single-Cell Analysis:
@@ -646,7 +626,6 @@ Key Data Engineering Considerations:
             "No specific domain context available for this expert type.")
     
     def _fill_missing_fields(self, task_analysis: Dict[str, Any], missing_fields: List[str]) -> Dict[str, Any]:
-        """为缺失的字段提供默认值"""
         task_analysis = task_analysis.copy()
         
         defaults = {
@@ -690,14 +669,11 @@ Key Data Engineering Considerations:
         return task_analysis
         
     def _validate_llm_config(self):
-        """验证LLM配置是否正确"""
         if not self.llm_client:
             raise ValueError("LLM client not initialized")
             
-        # 检查LLM客户端配置
         config_status = self.llm_client.get_config_status()
         
-        # 确保至少有一个LLM提供商配置正确
         providers_configured = [
             k for k, v in config_status.items()
             if k.endswith('_configured') and v
@@ -716,7 +692,6 @@ Key Data Engineering Considerations:
         """Save discussion history to file"""
         os.makedirs(output_dir, exist_ok=True)
         
-        # 保存每轮讨论
         output_file = os.path.join(output_dir, f"discussion_round_{self.current_round}.json")
         
         discussion_log = {
@@ -736,8 +711,7 @@ Key Data Engineering Considerations:
         
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(discussion_log, f, indent=2, ensure_ascii=False)
-            
-        # 保存讨论总结
+
         summary_file = os.path.join(output_dir, "discussion_summary.json")
         summary = {
             "total_rounds": self.current_round,

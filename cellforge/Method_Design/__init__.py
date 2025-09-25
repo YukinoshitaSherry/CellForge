@@ -8,7 +8,6 @@ from pathlib import Path
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    # 明确指定.env文件路径
     env_path = Path(__file__).parent.parent.parent / ".env"
     load_dotenv(env_path)
     print(f"Loaded .env from: {env_path}")
@@ -131,22 +130,18 @@ class ResearchPlanGenerator:
         """Save the generated plan to files."""
         if not self.refinement:
             raise ValueError("Plan not generated yet. Call generate_plan() first.")
-        
-        # 使用相对路径，基于项目根目录
+
         from pathlib import Path
         from datetime import datetime
         project_root = Path(__file__).parent.parent.parent  # scAgents根目录
-        
-        # 统一使用cellforge/data/results目录
+
         if output_dir == "results" or "results" in output_dir:
             output_path = project_root / "cellforge" / "data" / "results"
         else:
             output_path = Path(output_dir)
-        
-        # 确保目录存在
+
         output_path.mkdir(parents=True, exist_ok=True)
-        
-        # 生成带时间戳的文件名
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         base_filename = f"research_plan_{timestamp}"
         
@@ -181,8 +176,6 @@ class ResearchPlanGenerator:
                 print("Warning: matplotlib not available, skipping consensus plot")
             except Exception as e:
                 print(f"Warning: Could not save consensus plot: {e}")
-        
-        # 返回生成的文件名，供调用者使用
         return base_filename
 
 def generate_research_plan(task_analysis: Union[str, Dict[str, Any]], 
@@ -212,8 +205,7 @@ def generate_research_plan(task_analysis: Union[str, Dict[str, Any]],
     )
     plan = generator.generate_plan(task_type=task_type)
     base_filename = generator.save_plan(output_dir)
-    
-    # 添加文件信息到返回结果中
+
     plan['generated_files'] = {
         'base_filename': base_filename,
         'output_directory': output_dir,
@@ -224,8 +216,7 @@ def generate_research_plan(task_analysis: Union[str, Dict[str, Any]],
             f"{base_filename}_consensus.png"
         ]
     }
-    
-    # 自动生成代码
+
     if auto_generate_code:
         try:
             print("\n=== Starting Automatic Code Generation ===")
